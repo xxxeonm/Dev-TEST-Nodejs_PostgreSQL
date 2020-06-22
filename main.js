@@ -1,8 +1,12 @@
 var http = require('http');
 var url = require('url');
+var qs = require('querystring');
+
+var template = require('./lib/template.js');
 
 var topic = require('./lib/topic');
 var author = require('./lib/author');
+const client = require('./lib/db');
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
@@ -44,6 +48,26 @@ var app = http.createServer(function(request,response){
       });
     } else if (pathname === '/author'){
       author.home(request, response);
+    } else if (pathname === '/author/create_process') {
+      var body = '';
+      request.on('data', function(data) {
+          body += data;
+      });
+      request.on('end', function() {
+        author.create_process(request, response, body); // list와 같은 화면에서 create하므로 그냥 create는 필요없음
+      });
+    } else if (pathname === '/author/update') {
+      author.update(request, response);
+    } else if (pathname === '/author/update_process') {
+      var body = '';
+      request.on('data', function(data) {
+        body += data;
+      });
+      request.on('end', function() {
+        author.update_process(request, response, body);
+      })
+    } else if (pathname === '/author/delete_process') {
+      author.delete_process(request, response, queryData.id);
     } else {
       response.writeHead(404);
       response.end('Not found');
